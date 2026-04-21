@@ -426,6 +426,54 @@ h6 {
   position: relative;
 }
 
+/* Shared banner background for key detail/listing pages */
+.services-page .page-title,
+.service-details-page .page-title,
+.portfolio-page .page-title,
+.portfolio-details-page .page-title,
+.contact-page .page-title,
+.about-page .page-title,
+.starter-page-page .page-title {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../img/banner.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.services-page .page-title h1,
+.service-details-page .page-title h1,
+.portfolio-page .page-title h1,
+.portfolio-details-page .page-title h1,
+.contact-page .page-title h1,
+.about-page .page-title h1,
+.starter-page-page .page-title h1,
+.services-page .page-title .breadcrumbs ol,
+.service-details-page .page-title .breadcrumbs ol,
+.portfolio-page .page-title .breadcrumbs ol,
+.portfolio-details-page .page-title .breadcrumbs ol,
+.contact-page .page-title .breadcrumbs ol,
+.about-page .page-title .breadcrumbs ol,
+.starter-page-page .page-title .breadcrumbs ol,
+.services-page .page-title .breadcrumbs a,
+.service-details-page .page-title .breadcrumbs a,
+.portfolio-page .page-title .breadcrumbs a,
+.portfolio-details-page .page-title .breadcrumbs a,
+.contact-page .page-title .breadcrumbs a,
+.about-page .page-title .breadcrumbs a,
+.starter-page-page .page-title .breadcrumbs a {
+  color: #ffffff;
+}
+
+.services-page .page-title .breadcrumbs ol li+li::before,
+.service-details-page .page-title .breadcrumbs ol li+li::before,
+.portfolio-page .page-title .breadcrumbs ol li+li::before,
+.portfolio-details-page .page-title .breadcrumbs ol li+li::before,
+.contact-page .page-title .breadcrumbs ol li+li::before,
+.about-page .page-title .breadcrumbs ol li+li::before,
+.starter-page-page .page-title .breadcrumbs ol li+li::before {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .page-title h1 {
   font-size: 42px;
   font-weight: 700;

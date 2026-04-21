@@ -1,0 +1,244 @@
+/*--------------------------------------------------------------
+# Dark Mode Styles
+--------------------------------------------------------------*/
+
+/* Dark mode color variables */
+body.dark-mode {
+  --background-color: #0a0a0a;
+  --default-color: #e0e0e0;
+  --heading-color: #ffffff;
+  --accent-color: #ffffff;
+  --surface-color: #1a1a1a;
+  --contrast-color: #0a0a0a;
+  
+  /* Nav colors for dark mode */
+  --nav-color: #b0b0b0;
+  --nav-hover-color: #ffffff;
+  --nav-mobile-background-color: #1a1a1a;
+  --nav-dropdown-background-color: #1a1a1a;
+  --nav-dropdown-color: #b0b0b0;
+  --nav-dropdown-hover-color: #ffffff;
+}
+
+/* Light background sections in dark mode */
+body.dark-mode .light-background {
+  --background-color: #1a1a1a;
+  --surface-color: #252525;
+}
+
+/* Dark background sections in dark mode (inverted) */
+body.dark-mode .dark-background {
+  --background-color: #f9f9f9;
+  --default-color: #212529;
+  --heading-color: #000000;
+  --surface-color: #ffffff;
+  --contrast-color: #000000;
+}
+
+/* Header adjustments for dark mode */
+body.dark-mode #header {
+  background-color: rgba(10, 10, 10, 0.95);
+  box-shadow: 0px 0 18px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #header.scrolled {
+  background-color: rgba(10, 10, 10, 0.98);
+}
+
+/* Portfolio items in dark mode */
+body.dark-mode .portfolio-content {
+  background-color: var(--surface-color);
+}
+
+body.dark-mode .portfolio-info {
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.8) 50%, #0a0a0a 100%);
+}
+
+/* Portfolio filters in dark mode */
+body.dark-mode .portfolio-filters li {
+  color: var(--nav-color);
+}
+
+body.dark-mode .portfolio-filters li:hover,
+body.dark-mode .portfolio-filters li.filter-active {
+  color: var(--nav-hover-color);
+}
+
+/* Cards and surfaces in dark mode */
+body.dark-mode .service-item,
+body.dark-mode .testimonial-item,
+body.dark-mode .client-logo {
+  background-color: var(--surface-color);
+  border-color: #2a2a2a;
+}
+
+/* Forms in dark mode */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="tel"],
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: var(--surface-color);
+  border-color: #2a2a2a;
+  color: var(--default-color);
+}
+
+body.dark-mode input[type="text"]:focus,
+body.dark-mode input[type="email"]:focus,
+body.dark-mode input[type="tel"]:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: #4a4a4a;
+}
+
+/* Footer in dark mode */
+body.dark-mode #footer {
+  background-color: #0a0a0a;
+  border-top: 1px solid #2a2a2a;
+}
+
+/* Swiper pagination in dark mode */
+body.dark-mode .swiper-pagination-bullet {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .swiper-pagination-bullet-active {
+  background-color: #ffffff;
+}
+
+/* Scroll top button in dark mode */
+body.dark-mode .scroll-top {
+  background-color: var(--surface-color);
+  color: var(--default-color);
+  border: 1px solid #2a2a2a;
+}
+
+body.dark-mode .scroll-top:hover {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Mobile nav in dark mode */
+body.dark-mode.mobile-nav-active #navmenu {
+  background-color: var(--nav-mobile-background-color);
+}
+
+/* Image adjustments for dark mode */
+body.dark-mode img {
+  opacity: 0.9;
+}
+
+body.dark-mode img:hover {
+  opacity: 1;
+}
+
+/* Breadcrumbs in dark mode */
+body.dark-mode .breadcrumbs {
+  background-color: var(--surface-color);
+}
+
+/* Services list in dark mode */
+body.dark-mode .services-list a {
+  background-color: var(--surface-color);
+  border-color: #2a2a2a;
+}
+
+body.dark-mode .services-list a.active,
+body.dark-mode .services-list a:hover {
+  background-color: #2a2a2a;
+}
+
+/*--------------------------------------------------------------
+# Dark Mode Toggle Button
+--------------------------------------------------------------*/
+.dark-mode-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 996;
+  background: var(--accent-color);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--default-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dark-mode-toggle i {
+  font-size: 24px;
+  color: var(--contrast-color);
+  transition: all 0.3s ease;
+}
+
+/* Light mode button styling */
+body:not(.dark-mode) .dark-mode-toggle {
+  background: #000000;
+  border-color: #000000;
+}
+
+body:not(.dark-mode) .dark-mode-toggle i {
+  color: #ffffff;
+}
+
+/* Dark mode button styling */
+body.dark-mode .dark-mode-toggle {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+body.dark-mode .dark-mode-toggle i {
+  color: #000000;
+}
+
+/* Icon rotation animation */
+.dark-mode-toggle i {
+  animation: none;
+}
+
+.dark-mode-toggle:active i {
+  animation: rotate 0.5s ease;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dark-mode-toggle {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .dark-mode-toggle i {
+    font-size: 20px;
+  }
+}
+
+/* Smooth transition for all color changes */
+body,
+body * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Prevent transition on page load */
+body.preload * {
+  transition: none !important;
+}
