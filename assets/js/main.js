@@ -127,6 +127,17 @@
       link.setAttribute('data-glightbox', 'type: external; width: 360px; height: 640px;');
 
       if (cardImage) {
+        const originalSrc = cardImage.getAttribute('src');
+        if (originalSrc) {
+          cardImage.dataset.originalSrc = originalSrc;
+        }
+
+        cardImage.onerror = function onThumbnailError() {
+          if (this.dataset.originalSrc) {
+            this.src = this.dataset.originalSrc;
+          }
+        };
+
         cardImage.src = `https://vumbnail.com/${videoId}.jpg`;
         cardImage.alt = title;
         cardImage.loading = 'lazy';
@@ -142,6 +153,101 @@
    * while preserving category filters for Isotope.
    */
   function interleavePortfolioItems() {
+    const pinnedStartSequence = [
+      {
+        type: 'video',
+        keywords: ['abu anhna']
+      },
+      {
+        type: 'graphic',
+        keywords: ['av media instagram ad']
+      },
+      {
+        type: 'video',
+        keywords: ['regalia', 'av digital marketing']
+      },
+      {
+        type: 'graphic',
+        keywords: ['sun dental happy christmas', 'sun dental happy ester', 'sun dental easter']
+      },
+      {
+        type: 'graphic',
+        keywords: ['bz instagram branding screenshot']
+      }
+    ];
+
+    const companyPriorityKeywords = [
+      'regalia',
+      'abu anhna',
+      'av media instagram ad',
+      'sun dental happy christmas',
+      'sun dental happy ester',
+      'sun dental easter',
+      'bz instagram branding screenshot',
+      'bz furniture',
+      'sun dental',
+      'ic software',
+      'ic softwere',
+      'hospital',
+      'av events'
+    ];
+
+    const fallbackCompanyKeywords = [
+      'av gym',
+      'av media',
+      'clinic',
+      'furniture'
+    ];
+
+    function getItemSearchText(item) {
+      const title = item.querySelector('h4')?.textContent ?? '';
+      const alt = item.querySelector('img')?.getAttribute('alt') ?? '';
+      return `${title} ${alt}`.toLowerCase();
+    }
+
+    function getItemPriorityScore(item) {
+      const text = getItemSearchText(item);
+
+      const explicitMatchIndex = companyPriorityKeywords.findIndex((keyword) => text.includes(keyword));
+      if (explicitMatchIndex !== -1) {
+        return explicitMatchIndex;
+      }
+
+      if (fallbackCompanyKeywords.some((keyword) => text.includes(keyword))) {
+        return companyPriorityKeywords.length;
+      }
+
+      if (text.includes('personal brand')) {
+        return companyPriorityKeywords.length + fallbackCompanyKeywords.length + 10;
+      }
+
+      return companyPriorityKeywords.length + fallbackCompanyKeywords.length + 1;
+    }
+
+    function sortByCompanyPriority(items) {
+      return items
+        .map((item, index) => ({
+          item,
+          index,
+          score: getItemPriorityScore(item)
+        }))
+        .sort((a, b) => (a.score - b.score) || (a.index - b.index))
+        .map((entry) => entry.item);
+    }
+
+    function pullFirstMatch(items, keywords) {
+      const matchIndex = items.findIndex((item) => {
+        const text = getItemSearchText(item);
+        return keywords.some((keyword) => text.includes(keyword));
+      });
+
+      if (matchIndex === -1) {
+        return null;
+      }
+
+      return items.splice(matchIndex, 1)[0];
+    }
+
     document.querySelectorAll('.portfolio .isotope-container').forEach((container) => {
       const items = Array.from(container.querySelectorAll('.portfolio-item'));
       const showreelItems = items.filter((item) => item.classList.contains('filter-showreel'));
@@ -152,14 +258,26 @@
       }
 
       const mixed = [];
-      const maxLen = Math.max(showreelItems.length, graphicItems.length);
+
+      pinnedStartSequence.forEach((entry) => {
+        const sourceItems = entry.type === 'video' ? showreelItems : graphicItems;
+        const pinnedItem = pullFirstMatch(sourceItems, entry.keywords);
+
+        if (pinnedItem) {
+          mixed.push(pinnedItem);
+        }
+      });
+
+      const prioritizedShowreelItems = sortByCompanyPriority(showreelItems);
+      const prioritizedGraphicItems = sortByCompanyPriority(graphicItems);
+      const maxLen = Math.max(prioritizedShowreelItems.length, prioritizedGraphicItems.length);
 
       for (let i = 0; i < maxLen; i++) {
-        if (showreelItems[i]) {
-          mixed.push(showreelItems[i]);
+        if (prioritizedShowreelItems[i]) {
+          mixed.push(prioritizedShowreelItems[i]);
         }
-        if (graphicItems[i]) {
-          mixed.push(graphicItems[i]);
+        if (prioritizedGraphicItems[i]) {
+          mixed.push(prioritizedGraphicItems[i]);
         }
       }
 
