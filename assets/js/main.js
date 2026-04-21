@@ -289,6 +289,307 @@
 
   interleavePortfolioItems();
 
+  function slugify(value) {
+    return (value || '')
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function titleCaseFilter(filterSlug) {
+    const labels = {
+      showreel: 'Showreel',
+      cinematic: 'Cinematic',
+      identity: 'Identity',
+      motion: 'Motion',
+      tactical: 'Tactical'
+    };
+    return labels[filterSlug] || 'Portfolio';
+  }
+
+  function wireServiceDetailLinks() {
+    document.querySelectorAll('.services .service-item').forEach((item) => {
+      const title = item.querySelector('h3')?.textContent?.trim() || 'Service';
+      const slug = slugify(title);
+
+      item.querySelectorAll('a[href*="service-details.html"]').forEach((link) => {
+        link.setAttribute('href', `service-details.html?service=${encodeURIComponent(slug)}`);
+      });
+    });
+  }
+
+  function wirePortfolioDetailLinks() {
+    document.querySelectorAll('.portfolio .portfolio-item').forEach((item) => {
+      const title = item.querySelector('.portfolio-info h4')?.textContent?.trim() || 'Portfolio Project';
+      const summary = item.querySelector('.portfolio-info p')?.textContent?.trim() || '';
+      const image = item.querySelector('img')?.getAttribute('src') || '';
+      const previewLink = item.querySelector('.portfolio-info .preview-link');
+      const media = previewLink?.getAttribute('href') || image;
+      const mediaType = media.includes('player.vimeo.com/video/') ? 'video' : 'image';
+      const filterClass = Array.from(item.classList).find((name) => name.startsWith('filter-')) || 'filter-showreel';
+      const category = filterClass.replace('filter-', '');
+
+      const params = new URLSearchParams({
+        project: slugify(title),
+        title,
+        category,
+        summary,
+        image,
+        mediaType,
+        media
+      });
+
+      item.querySelectorAll('.details-link[href*="portfolio-details.html"]').forEach((link) => {
+        link.setAttribute('href', `portfolio-details.html?${params.toString()}`);
+      });
+    });
+  }
+
+  function renderServiceDetailsPage() {
+    if (!document.body.classList.contains('service-details-page')) {
+      return;
+    }
+
+    const services = {
+      'cinematic-content-strategy': {
+        title: 'Cinematic Content Strategy',
+        sideTitle: 'How the cinematic strategy works',
+        sideText: 'We audit your market positioning, then engineer narrative sequences that combine authority visuals with conversion intent.',
+        heading: 'Build attention with structured cinematic storytelling',
+        intro: 'From hook design to pacing and post-production rhythm, every edit decision is aligned to business outcomes.',
+        bullets: [
+          'Offer-first narrative architecture for short-form and long-form assets.',
+          'Performance-ready editing workflow for reels, ads, and launch videos.',
+          'Consistent visual identity across all campaign deliverables.'
+        ],
+        bodyOne: 'You get a repeatable system that keeps content quality high while increasing speed of execution.',
+        bodyTwo: 'The result is stronger trust, clearer positioning, and higher-quality inbound opportunities.'
+      },
+      'brand-identity-design': {
+        title: 'Brand Identity Design',
+        sideTitle: 'How identity design is executed',
+        sideText: 'We translate your strategic position into visual systems that remain consistent from logo to campaign rollout.',
+        heading: 'Design an identity system people recognize instantly',
+        intro: 'Identity is not only a logo. It is the full visual language that carries your positioning into every touchpoint.',
+        bullets: [
+          'Logo direction, typography standards, and color logic.',
+          'Campaign-safe templates for social, ad, and presentation use.',
+          'Guidelines that keep teams aligned across channels.'
+        ],
+        bodyOne: 'This protects brand credibility as you scale content volume and team size.',
+        bodyTwo: 'The outcome is a premium, coherent brand presence that improves recall and conversion.'
+      },
+      'performance-marketing-funnels': {
+        title: 'Performance Marketing Funnels',
+        sideTitle: 'How the funnel is constructed',
+        sideText: 'We connect content, landing flow, and offer positioning so attention turns into qualified demand.',
+        heading: 'Turn content views into measurable revenue actions',
+        intro: 'Creative assets are mapped to awareness, consideration, and decision phases for cleaner user journeys.',
+        bullets: [
+          'Audience-specific content pillars and offer angles.',
+          'Conversion-focused sequencing across paid and organic touchpoints.',
+          'Iteration loops based on real performance signals.'
+        ],
+        bodyOne: 'The system reduces wasted spend and improves consistency in lead quality.',
+        bodyTwo: 'You get a scalable growth framework built on strategy, not random posting.'
+      },
+      'social-campaign-execution': {
+        title: 'Social Campaign Execution',
+        sideTitle: 'How campaigns are deployed',
+        sideText: 'We run campaign calendars with message discipline, visual consistency, and platform-fit content packaging.',
+        heading: 'Execute social campaigns with speed and precision',
+        intro: 'Each campaign is structured by objective, creative angle, and channel behavior to maximize relevance.',
+        bullets: [
+          'Weekly and monthly content planning by campaign goal.',
+          'Creative production pipeline for reels, posters, and ad variants.',
+          'Cross-platform publishing rhythm with quality control.'
+        ],
+        bodyOne: 'Execution becomes predictable, and your team gets clear production priorities.',
+        bodyTwo: 'This creates momentum and keeps your brand consistently visible in the right market context.'
+      },
+      'post-production-systems': {
+        title: 'Post-Production Systems',
+        sideTitle: 'How post-production is systemized',
+        sideText: 'We build editing and asset pipelines that reduce turnaround time without sacrificing visual standards.',
+        heading: 'Scale content output with a high-quality post pipeline',
+        intro: 'Post-production is treated as an operating system with naming, versioning, and delivery standards.',
+        bullets: [
+          'Template-driven edit stacks for recurring content types.',
+          'File management, render presets, and handoff standards.',
+          'Quality checks for consistency across all final exports.'
+        ],
+        bodyOne: 'You eliminate bottlenecks and maintain polish even under campaign pressure.',
+        bodyTwo: 'The result is faster delivery cycles with brand-level consistency in every asset.'
+      }
+    };
+
+    const requested = slugify(new URLSearchParams(window.location.search).get('service'));
+    const selectedKey = services[requested] ? requested : 'cinematic-content-strategy';
+    const selected = services[selectedKey];
+
+    const pageTitle = document.querySelector('.page-title h1');
+    const breadcrumbCurrent = document.querySelector('.breadcrumbs .current');
+    const servicesListLinks = document.querySelectorAll('#service-details .services-list a');
+    const sideTitle = document.querySelector('#service-details .col-lg-4 h4');
+    const sideText = document.querySelector('#service-details .col-lg-4 p');
+    const heading = document.querySelector('#service-details .col-lg-8 h3');
+    const paragraphs = document.querySelectorAll('#service-details .col-lg-8 p');
+    const bulletSpans = document.querySelectorAll('#service-details .col-lg-8 ul li span');
+
+    if (pageTitle) pageTitle.textContent = selected.title;
+    if (breadcrumbCurrent) breadcrumbCurrent.textContent = selected.title;
+    document.title = `${selected.title} - Nahom Portfolio`;
+
+    const serviceOrder = Object.keys(services);
+    servicesListLinks.forEach((link, index) => {
+      const key = serviceOrder[index] || selectedKey;
+      link.textContent = services[key].title;
+      link.setAttribute('href', `service-details.html?service=${encodeURIComponent(key)}`);
+      link.classList.toggle('active', key === selectedKey);
+    });
+
+    if (sideTitle) sideTitle.textContent = selected.sideTitle;
+    if (sideText) sideText.textContent = selected.sideText;
+    if (heading) heading.textContent = selected.heading;
+    if (paragraphs[0]) paragraphs[0].textContent = selected.intro;
+    if (paragraphs[1]) paragraphs[1].textContent = selected.bodyOne;
+    if (paragraphs[2]) paragraphs[2].textContent = selected.bodyTwo;
+
+    bulletSpans.forEach((span, index) => {
+      if (selected.bullets[index]) {
+        span.textContent = selected.bullets[index];
+      }
+    });
+  }
+
+  function buildPortfolioGallery(category, selectedImage) {
+    const galleries = {
+      showreel: [
+        'assets/img/portfolio/app-1.jpg',
+        'assets/img/portfolio/product-1.jpg',
+        'assets/img/portfolio/branding-1.jpg',
+        'assets/img/portfolio/books-1.jpg'
+      ],
+      identity: [
+        'assets/img/portfolio/avgym_management%20logo.png',
+        'assets/img/portfolio/avmedia%20bussinescardfront%20view.png',
+        'assets/img/portfolio/AV%20EVENTS%20bussines%20card%20back%20view.png'
+      ],
+      motion: [
+        'assets/img/portfolio/avmedia%20instagram%20ad%20poster.jpg',
+        'assets/img/portfolio/instagram%20photo%20poster.jpg',
+        'assets/img/portfolio/BZ%20furniture%20tiktok%20photo%20poster.jpg',
+        'assets/img/portfolio/BZ%20facebook%20cover%20image%20.jpg'
+      ],
+      tactical: [
+        'assets/img/portfolio/AV%20Marketing%20Agency%20Promotion%20Flyer.png',
+        'assets/img/portfolio/IC%20softwere%20solutions%20poster.jpg',
+        'assets/img/portfolio/mobile%20app%20coming%20soon%20poster.png',
+        'assets/img/portfolio/sun%20Dental%20Clinic%20happy%20ester%20poster.png'
+      ],
+      cinematic: [
+        'assets/img/portfolio/detaled%20blackand%20white%20photgraphy.jpg',
+        'assets/img/portfolio/photography%20.jpg',
+        'assets/img/portfolio/abala%20mob.jpg',
+        'assets/img/portfolio/mark%20brand%20banner%20.jpg'
+      ]
+    };
+
+    const categoryImages = galleries[category] || galleries.showreel;
+    const allImages = [selectedImage, ...categoryImages].filter(Boolean);
+    return Array.from(new Set(allImages)).slice(0, 4);
+  }
+
+  function renderPortfolioDetailsPage() {
+    if (!document.body.classList.contains('portfolio-details-page')) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const title = params.get('title') || 'Portfolio Project';
+    const category = slugify(params.get('category') || 'showreel');
+    const summary = params.get('summary') || 'Project crafted to improve brand visibility and conversion performance.';
+    const image = params.get('image') || 'assets/img/portfolio/app-1.jpg';
+    const mediaType = params.get('mediaType') || 'image';
+    const media = params.get('media') || image;
+
+    const pageTitle = document.querySelector('.page-title h1');
+    const breadcrumbCurrent = document.querySelector('.breadcrumbs .current');
+    const sliderWrapper = document.querySelector('#portfolio-details .swiper-wrapper');
+    const infoList = document.querySelector('#portfolio-details .portfolio-info ul');
+    const infoHeading = document.querySelector('#portfolio-details .portfolio-info h3');
+    const descriptionHeading = document.querySelector('#portfolio-details .portfolio-description h2');
+    const descriptionBody = document.querySelector('#portfolio-details .portfolio-description p');
+
+    if (pageTitle) pageTitle.textContent = title;
+    if (breadcrumbCurrent) breadcrumbCurrent.textContent = title;
+    if (infoHeading) infoHeading.textContent = 'Project information';
+    if (descriptionHeading) descriptionHeading.textContent = title;
+
+    const categoryLabel = titleCaseFilter(category);
+    const longSummary = `${summary} This execution was designed to strengthen positioning, trust, and measurable response across target channels.`;
+    if (descriptionBody) descriptionBody.textContent = longSummary;
+    document.title = `${title} - Nahom Portfolio`;
+
+    if (infoList) {
+      infoList.innerHTML = '';
+
+      const rows = [
+        ['Category', categoryLabel],
+        ['Project', title],
+        ['Media', mediaType === 'video' ? 'Video Campaign' : 'Visual Design']
+      ];
+
+      rows.forEach(([key, value]) => {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = key;
+        li.appendChild(strong);
+        li.append(`: ${value}`);
+        infoList.appendChild(li);
+      });
+
+      if (mediaType === 'video' && media.includes('player.vimeo.com/video/')) {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = 'Watch';
+        li.appendChild(strong);
+        li.append(': ');
+
+        const a = document.createElement('a');
+        a.href = media;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'Open video preview';
+        li.appendChild(a);
+        infoList.appendChild(li);
+      }
+    }
+
+    if (sliderWrapper) {
+      sliderWrapper.innerHTML = '';
+      const gallery = buildPortfolioGallery(category, image);
+
+      gallery.forEach((src) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = title;
+
+        slide.appendChild(img);
+        sliderWrapper.appendChild(slide);
+      });
+    }
+  }
+
+  wireServiceDetailLinks();
+  wirePortfolioDetailLinks();
+  renderServiceDetailsPage();
+  renderPortfolioDetailsPage();
+
   /**
    * Initiate glightbox
    */
