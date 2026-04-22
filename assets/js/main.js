@@ -120,6 +120,18 @@
       const videoId = idMatch[1];
       const title = link.getAttribute('title') || 'Portfolio video';
       const cardImage = link.closest('.portfolio-content')?.querySelector('img');
+      let autoplayHref = href;
+
+      try {
+        const videoUrl = new URL(href, window.location.origin);
+        videoUrl.searchParams.set('autoplay', '1');
+        videoUrl.searchParams.set('autopause', '0');
+        autoplayHref = videoUrl.toString();
+      } catch (error) {
+        autoplayHref = href;
+      }
+
+      link.setAttribute('href', autoplayHref);
 
       link.dataset.type = 'external';
       link.dataset.width = '360px';
@@ -147,6 +159,35 @@
   }
 
   setupVerticalVimeoPortfolio();
+
+  function removePortfolioDetailLinks() {
+    document.querySelectorAll('.portfolio .details-link').forEach((link) => {
+      link.remove();
+    });
+  }
+
+  function wirePortfolioCardClickToPreview() {
+    document.querySelectorAll('.portfolio .portfolio-item .portfolio-content').forEach((card) => {
+      const previewLink = card.querySelector('.portfolio-info .preview-link');
+
+      if (!previewLink) {
+        return;
+      }
+
+      card.style.cursor = 'pointer';
+
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('.preview-link')) {
+          return;
+        }
+
+        previewLink.click();
+      });
+    });
+  }
+
+  removePortfolioDetailLinks();
+  wirePortfolioCardClickToPreview();
 
   /**
    * Mix showreel and graphic cards in the default All view
@@ -594,7 +635,8 @@
    * Initiate glightbox
    */
   const glightbox = GLightbox({
-    selector: '.glightbox'
+    selector: '.glightbox',
+    autoplayVideos: true
   });
 
   /**
